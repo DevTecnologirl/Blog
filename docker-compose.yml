@@ -1,0 +1,36 @@
+services:
+  database:
+    image: postgres
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nestdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: nest_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    environment:
+      DATABASE_URL: postgres://postgres:password@database:5432/nestdb
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: nuxt_frontend
+    restart: always
+    ports:
+      - "3001:3000"
+
+volumes:
+  postgres_data:
